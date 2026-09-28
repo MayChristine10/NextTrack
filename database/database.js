@@ -12,15 +12,40 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 db.serialize(() => {
+    // Stores metadata returned from MusicBrainz
     db.run(`
-    CREATE TABLE IF NOT EXISTS Favorites (
-        favorite_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        track_id TEXT,
-        title TEXT,
-        artist TEXT,
-        saved_at TEXT
-    )
-`);
+        CREATE TABLE IF NOT EXISTS Music_Metadata_Cache (
+            metadata_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            track_id TEXT,
+            title TEXT,
+            artist TEXT,
+            musicbrainz_score REAL,
+            last_updated TEXT
+        )
+    `);
+
+    // Stores recent searches for the History and Statistics sections
+    db.run(`
+        CREATE TABLE IF NOT EXISTS Search_History (
+            search_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            song TEXT,
+            genre TEXT,
+            mood TEXT,
+            artist TEXT,
+            searched_at TEXT
+        )
+    `);
+
+    // Stores tracks manually saved by the user
+    db.run(`
+        CREATE TABLE IF NOT EXISTS Favorites (
+            favorite_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            track_id TEXT,
+            title TEXT,
+            artist TEXT,
+            saved_at TEXT
+        )
+    `);
 });
 
 function saveMetadataToCache(track) {
